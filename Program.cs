@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using ConsoleTables;
 
 namespace OneListClient
 {
@@ -10,17 +12,22 @@ namespace OneListClient
     {
         class Item
         {
-            public int id { get; set; }
-            public string text { get; set; }
-            public bool complete { get; set; }
-            public DateTime created_at { get; set; }
-            public DateTime updated_at { get; set; }
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+            [JsonPropertyName("text")]
+            public string Text { get; set; }
+            [JsonPropertyName("complete")]
+            public bool Complete { get; set; }
+            [JsonPropertyName("created_at")]
+            public DateTime CreatedAt { get; set; }
+            [JsonPropertyName("updated_at")]
+            public DateTime UpdatedAt { get; set; }
             public string CompletedStatus
             {
                 get
                 {
                     // Uses a ternary to return "completed" if the 'complete variable. Returns "not completed" if false
-                    return complete ? "completed" : "not completed";
+                    return Complete ? "completed" : "not completed";
                 }
             }
         }
@@ -34,12 +41,18 @@ namespace OneListClient
             // Supply that stream of data to a Deserialize that will interpret it as a List of Item objects.
             var items = await JsonSerializer.DeserializeAsync<List<Item>>(responseAsStream);
 
+            // add a table
+            var table = new ConsoleTable("Description", "Created At", "Completed");
+
             // For each item in our deserialized List of items
             foreach (var item in items)
             {
                 // Output some details on that item.
-                Console.WriteLine($"The task {item.text} was created on {item.created_at} and is {item.CompletedStatus}");
+                table.AddRow(item.Text, item.CreatedAt, item.CompletedStatus);
             }
+
+            // Write Table
+            table.Write();
         }
     }
 }
