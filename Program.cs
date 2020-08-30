@@ -33,10 +33,22 @@ namespace OneListClient
         }
         static async Task Main(string[] args)
         {
+            var token = "";
+
+            if (args.Length == 0)
+            {
+                Console.Write("What list would you like? ");
+                token = Console.ReadLine();
+            }
+            else
+            {
+                token = args[0];
+            }
             var client = new HttpClient();
 
             // Make a 'Get' request to the API and get back a stream of data.
-            var responseAsStream = await client.GetStreamAsync("https://one-list-api.herokuapp.com/items?access_token=josh");
+            var url = $"https://one-list-api.herokuapp.com/items?access_token={token}";
+            var responseAsStream = await client.GetStreamAsync(url);
 
             // Supply that stream of data to a Deserialize that will interpret it as a List of Item objects.
             var items = await JsonSerializer.DeserializeAsync<List<Item>>(responseAsStream);
