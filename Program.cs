@@ -55,6 +55,22 @@ namespace OneListClient
             // Write Table
             table.Write(Format.Minimal);
         }
+        static async Task GetOneItem(string token, int id)
+        {
+            var client = new HttpClient();
+
+            var url = $"https://one-list-api.herokuapp.com/items/{id}?access_token={token}";
+
+            var responseAsStream = await client.GetStreamAsync(url);
+
+            var item = await JsonSerializer.DeserializeAsync<Item>(responseAsStream);
+
+            var table = new ConsoleTable("ID", "Description", "Created At", "Updated At", "Completed");
+
+            table.AddRow(item.Id, item.Text, item.CreatedAt, item.UpdatedAt, item.CompletedStatus);
+
+            table.Write(Format.Minimal);
+        }
         static async Task Main(string[] args)
         {
             var token = "";
@@ -73,7 +89,7 @@ namespace OneListClient
             while (keepGoing)
             {
                 Console.Clear();
-                Console.Write("Get (A)ll todo or (Q)uit: ");
+                Console.Write("Get (A)ll todo, or Get (O)ne todo, or (Q)uit: ");
                 var choice = Console.ReadLine().ToUpper();
 
                 switch (choice)
@@ -83,6 +99,15 @@ namespace OneListClient
                         break;
                     case "A":
                         await ShowAllItems(token);
+
+                        Console.WriteLine("Press ENTER to continue");
+                        Console.ReadLine();
+                        break;
+                    case "O":
+                        Console.Write("Enter the ID of the item to show: ");
+                        var id = int.Parse(Console.ReadLine());
+
+                        await GetOneItem(token, id);
 
                         Console.WriteLine("Press ENTER to continue");
                         Console.ReadLine();
