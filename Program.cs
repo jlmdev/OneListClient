@@ -31,19 +31,8 @@ namespace OneListClient
                 }
             }
         }
-        static async Task Main(string[] args)
+        static async Task ShowAllItems(string token)
         {
-            var token = "";
-
-            if (args.Length == 0)
-            {
-                Console.Write("What list would you like? ");
-                token = Console.ReadLine();
-            }
-            else
-            {
-                token = args[0];
-            }
             var client = new HttpClient();
 
             // Make a 'Get' request to the API and get back a stream of data.
@@ -64,7 +53,45 @@ namespace OneListClient
             }
 
             // Write Table
-            table.Write();
+            table.Write(Format.Minimal);
+        }
+        static async Task Main(string[] args)
+        {
+            var token = "";
+
+            if (args.Length == 0)
+            {
+                Console.Write("What list would you like? ");
+                token = Console.ReadLine();
+            }
+            else
+            {
+                token = args[0];
+            }
+
+            var keepGoing = true;
+            while (keepGoing)
+            {
+                Console.Clear();
+                Console.Write("Get (A)ll todo or (Q)uit: ");
+                var choice = Console.ReadLine().ToUpper();
+
+                switch (choice)
+                {
+                    case "Q":
+                        keepGoing = false;
+                        break;
+                    case "A":
+                        await ShowAllItems(token);
+
+                        Console.WriteLine("Press ENTER to continue");
+                        Console.ReadLine();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 }
